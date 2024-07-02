@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
@@ -8,27 +6,30 @@ public class PlayerScript : MonoBehaviour
     private float hMovement, vMovement;
     [SerializeField] private float playerSpeed = 30f;
 
-    Camera mainCamera;
+    private Camera mainCamera;
+
+    private Animator animator;
 
     // Start is called before the first frame update
     private void Start()
     {
         mainCamera = Camera.main;
         rb = GetComponentInChildren<Rigidbody>();
+        animator = GetComponentInChildren<Animator>();
     }
 
     // Update is called once per frame
     private void Update()
     {
         MouseAim();
+        Debug.Log(rb.velocity.normalized);
     }
 
     private void FixedUpdate()
     {
         PlayerMovement();
+        PlayerMovementAnimations();
     }
-
-
 
     private void PlayerMovement()
     {
@@ -38,10 +39,21 @@ public class PlayerScript : MonoBehaviour
         {
             rb.AddForce(Vector3.right * playerSpeed * hMovement);
             rb.AddForce(Vector3.forward * playerSpeed * vMovement);
-
         }
     }
 
+    private void PlayerMovementAnimations()
+    {
+        // Check the magnitude of the velocity vector
+        if (rb.velocity.magnitude > 0.1f) // Adjust the threshold as needed
+        {
+            animator.SetBool("isRunning", true);
+        }
+        else
+        {
+            animator.SetBool("isRunning", false);
+        }
+    }
 
     private void MouseAim()
     {
@@ -65,6 +77,5 @@ public class PlayerScript : MonoBehaviour
             // Apply the rotation to the weapon, ensuring it only rotates around the y-axis
             transform.rotation = Quaternion.Euler(0, rotation.eulerAngles.y, 0);
         }
-
     }
 }
