@@ -22,11 +22,10 @@ public class PlayerScript : MonoBehaviour
     private void Update()
     {
         MouseAim();
-        Debug.Log(rb.velocity.normalized);
     }
 
     private void FixedUpdate()
-    {
+{
         PlayerMovement();
         PlayerMovementAnimations();
     }

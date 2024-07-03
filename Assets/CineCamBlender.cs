@@ -15,11 +15,7 @@ public class CineCamBlender : MonoBehaviour
 
     private void Start()
     {
-        if (player.GetComponent<PlayerScript>() == null)
-        {
-            Debug.Log("Player not found on CinCamBlender script");
-        }
-
+      
         playerRb = player.GetComponent<Rigidbody>();
         cinemachineBrain = Camera.main.GetComponent<CinemachineBrain>();
 
