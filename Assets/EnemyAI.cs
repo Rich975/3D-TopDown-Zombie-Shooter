@@ -1,18 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class ZombieScript : MonoBehaviour
+public class EnemyAI : MonoBehaviour
 {
     /* Behaviors needed:
-    - Wandering about 
+    - Wandering about
     - When triggered by player, they chase him
     */
 
     [SerializeField] private float wanderRadius;
     [SerializeField] private float wanderTimer;
     [SerializeField] private float chaseCooldown;
+    [SerializeField] private float distanceToAttackPlayer = 1.5f;
+
+    [SerializeField] private Material wanderMaterial;
+    [SerializeField] private Material attackMaterial;
+    private Renderer zombieRenderer;
 
     private Transform player;
     private NavMeshAgent agent;
@@ -20,8 +23,14 @@ public class ZombieScript : MonoBehaviour
     private float cooldownTimer;
     private float wanderTimerCounter;
 
-    void Start()
+    public enum EnemyStates
+    { Wandering, Following, Attacking }
+
+    public EnemyStates enemyState;
+
+    private void Start()
     {
+        zombieRenderer = GetComponentInChildren<Renderer>();
         agent = GetComponent<NavMeshAgent>();
         isTriggered = false;
         cooldownTimer = chaseCooldown;
@@ -29,7 +38,7 @@ public class ZombieScript : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
-    void Update()
+    private void FixedUpdate()
     {
         if (isTriggered)
         {
@@ -37,6 +46,7 @@ public class ZombieScript : MonoBehaviour
             if (cooldownTimer > 0)
             {
                 FollowPlayer();
+                AttackPlayer();
             }
             else
             {
@@ -48,16 +58,39 @@ public class ZombieScript : MonoBehaviour
         {
             Wander();
         }
+
+        if (isTriggered && Vector3.Distance(transform.position, player.position) <= distanceToAttackPlayer)
+        {
+            AttackPlayer();
+        }
     }
+
+
+    private void ChangeMyMaterial(Material material)
+    {
+        zombieRenderer.material = material;  
+    }
+
+
 
     private void FollowPlayer()
     {
         agent.SetDestination(player.position);
+        //agent.stoppingDistance = 1.5f;
+
+        //turn forward vector towards player
         Vector3 direction = player.transform.position - agent.transform.forward;
         Quaternion rotation = Quaternion.LookRotation(direction);
+
     }
 
+    private void AttackPlayer()
+    {
+        Debug.Log("Attacking player");
+        ChangeMyMaterial(attackMaterial);
 
+
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -77,13 +110,12 @@ public class ZombieScript : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-            isTriggered = false;
-
+        isTriggered = false;
     }
-
 
     private void Wander()
     {
+        ChangeMyMaterial(wanderMaterial);
         wanderTimerCounter -= Time.deltaTime;
         if (wanderTimerCounter <= 0)
         {
@@ -102,4 +134,3 @@ public class ZombieScript : MonoBehaviour
         return navHit.position;
     }
 }
-

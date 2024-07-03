@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerScript : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     private Rigidbody rb;
     private float hMovement, vMovement;
@@ -25,7 +25,7 @@ public class PlayerScript : MonoBehaviour
     }
 
     private void FixedUpdate()
-{
+    {
         PlayerMovement();
         PlayerMovementAnimations();
     }

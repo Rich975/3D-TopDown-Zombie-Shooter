@@ -15,7 +15,6 @@ public class CineCamBlender : MonoBehaviour
 
     private void Start()
     {
-      
         playerRb = player.GetComponent<Rigidbody>();
         cinemachineBrain = Camera.main.GetComponent<CinemachineBrain>();
 
