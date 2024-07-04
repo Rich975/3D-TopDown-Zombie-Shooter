@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyAI : MonoBehaviour
+public class EnemyAI : MonoBehaviour, IDamageable
 {
     /* Behaviors needed:
     - Wandering about
@@ -22,6 +22,10 @@ public class EnemyAI : MonoBehaviour
     private bool isTriggered;
     private float cooldownTimer;
     private float wanderTimerCounter;
+    private Vector3 lastPlayerPosition;
+
+    public float maxHealth = 50f;
+    private HealthSystem healthSystem;
 
     public enum EnemyStates
     { Wandering, Following, Attacking }
@@ -30,6 +34,11 @@ public class EnemyAI : MonoBehaviour
 
     private void Start()
     {
+        healthSystem = new HealthSystem(maxHealth);
+
+        healthSystem.OnHealthChanged += HandleHealthChanged;
+        healthSystem.OnDeath += HandleDeath;
+
         zombieRenderer = GetComponentInChildren<Renderer>();
         agent = GetComponent<NavMeshAgent>();
         isTriggered = false;
@@ -38,7 +47,7 @@ public class EnemyAI : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         if (isTriggered)
         {
@@ -46,50 +55,68 @@ public class EnemyAI : MonoBehaviour
             if (cooldownTimer > 0)
             {
                 FollowPlayer();
-                AttackPlayer();
             }
             else
             {
                 isTriggered = false;
                 cooldownTimer = chaseCooldown;
+                ChangeMyMaterial(wanderMaterial);
             }
         }
         else
         {
             Wander();
         }
+    }
 
+    private void FixedUpdate()
+    {
+        // Check if the enemy can attack the player
         if (isTriggered && Vector3.Distance(transform.position, player.position) <= distanceToAttackPlayer)
         {
             AttackPlayer();
         }
     }
 
-
-    private void ChangeMyMaterial(Material material)
+    public void TakeDamage(float damage)
     {
-        zombieRenderer.material = material;  
+        healthSystem.TakeDamage(damage);
+    }
+
+    private void HandleHealthChanged(float healthPercent)
+    {
+        // Update enemy health bar or other UI if necessary
     }
 
 
+    private void ChangeMyMaterial(Material material)
+    {
+        if (zombieRenderer.material != material)
+        {
+            zombieRenderer.material = material;
+        }
+    }
+
+    private void HandleDeath()
+    {
+        // Handle enemy death (e.g., drop loot, play animation)
+        Debug.Log("Enemy is dead!");
+        Destroy(gameObject);
+    }
 
     private void FollowPlayer()
     {
-        agent.SetDestination(player.position);
-        //agent.stoppingDistance = 1.5f;
-
-        //turn forward vector towards player
-        Vector3 direction = player.transform.position - agent.transform.forward;
-        Quaternion rotation = Quaternion.LookRotation(direction);
-
+        if (Vector3.Distance(player.position, lastPlayerPosition) > 0.1f) // Avoid stuttering by only updating if position has changed significantly
+        {
+            agent.SetDestination(player.position);
+            lastPlayerPosition = player.position;
+        }
+        ChangeMyMaterial(attackMaterial);
     }
 
     private void AttackPlayer()
     {
-        Debug.Log("Attacking player");
-        ChangeMyMaterial(attackMaterial);
-
-
+        //Debug.Log("Attacking player");
     }
 
     private void OnTriggerEnter(Collider other)
@@ -97,6 +124,7 @@ public class EnemyAI : MonoBehaviour
         if (other.gameObject.CompareTag("Player"))
         {
             isTriggered = true;
+            cooldownTimer = chaseCooldown; // Reset cooldown when triggered
         }
     }
 
@@ -115,7 +143,6 @@ public class EnemyAI : MonoBehaviour
 
     private void Wander()
     {
-        ChangeMyMaterial(wanderMaterial);
         wanderTimerCounter -= Time.deltaTime;
         if (wanderTimerCounter <= 0)
         {

@@ -1,21 +1,33 @@
 using UnityEngine;
+using UnityEngine.UI;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IDamageable
 {
     private Rigidbody rb;
     private float hMovement, vMovement;
     [SerializeField] private float playerSpeed = 30f;
 
     private Camera mainCamera;
-
     private Animator animator;
+
+    public float maxHealth = 100f;
+    private HealthSystem healthSystem;
+    private HealthBar healthBar;
 
     // Start is called before the first frame update
     private void Start()
     {
+        healthSystem = new HealthSystem(maxHealth);
+        healthBar = FindObjectOfType<HealthBar>();
+        Debug.Log(healthBar.gameObject);
+
+        healthSystem.OnHealthChanged += HandleHealthChanged;
+        healthSystem.OnDeath += HandleDeath;
+
         mainCamera = Camera.main;
         rb = GetComponentInChildren<Rigidbody>();
         animator = GetComponentInChildren<Animator>();
+        
     }
 
     // Update is called once per frame
@@ -28,6 +40,22 @@ public class PlayerController : MonoBehaviour
     {
         PlayerMovement();
         PlayerMovementAnimations();
+    }
+
+    public void TakeDamage(float damage)
+    {
+        healthSystem.TakeDamage(damage);
+    }
+
+    private void HandleHealthChanged(float healthPercent)
+    {
+        healthBar.UpdateHealthBar(healthPercent);
+    }
+
+    private void HandleDeath()
+    {
+        // Handle player death (e.g., show game over screen)
+        Debug.Log("Player is dead!");
     }
 
     private void PlayerMovement()
@@ -75,6 +103,15 @@ public class PlayerController : MonoBehaviour
 
             // Apply the rotation to the weapon, ensuring it only rotates around the y-axis
             transform.rotation = Quaternion.Euler(0, rotation.eulerAngles.y, 0);
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Zombie"))
+        {
+            TakeDamage(10);
+            HandleHealthChanged(20);
         }
     }
 }

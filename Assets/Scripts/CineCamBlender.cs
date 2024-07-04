@@ -41,4 +41,5 @@ public class CineCamBlender : MonoBehaviour
             zoomedInCam.Priority = 10;
         }
     }
+
 }

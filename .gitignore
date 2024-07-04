@@ -72,3 +72,8 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+Assets/QHierarchy/Editor/Scripts/pcomponent/QChildrenCountComponent.cs
+Assets/QHierarchy/Editor/Scripts/pcomponent/QColorComponent.cs
+Assets/QHierarchy/Editor/Scripts/pcomponent/QComponentsComponent.cs
+Assets/QHierarchy/Editor/Scripts/pcomponent/QErrorComponent.cs
+Assets/QHierarchy/Editor/Scripts/pcomponent/pbase/QBaseComponent.cs
