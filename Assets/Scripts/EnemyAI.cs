@@ -3,14 +3,9 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour, IDamageable
 {
-    /* Behaviors needed:
-    - Wandering about
-    - When triggered by player, they chase him
-    */
-
-    [SerializeField] private float wanderRadius;
-    [SerializeField] private float wanderTimer;
-    [SerializeField] private float chaseCooldown;
+    [SerializeField] private float wanderRadius = 10f;
+    [SerializeField] private float wanderTimer = 5f;
+    [SerializeField] private float chaseCooldown = 10f;
     [SerializeField] private float distanceToAttackPlayer = 1.5f;
 
     [SerializeField] private Material wanderMaterial;
@@ -27,15 +22,12 @@ public class EnemyAI : MonoBehaviour, IDamageable
     public float maxHealth = 50f;
     private HealthSystem healthSystem;
 
-    public enum EnemyStates
-    { Wandering, Following, Attacking }
-
+    public enum EnemyStates { Wandering, Following, Attacking }
     public EnemyStates enemyState;
 
     private void Start()
     {
         healthSystem = new HealthSystem(maxHealth);
-
         healthSystem.OnHealthChanged += HandleHealthChanged;
         healthSystem.OnDeath += HandleDeath;
 
@@ -49,32 +41,42 @@ public class EnemyAI : MonoBehaviour, IDamageable
 
     private void Update()
     {
+        switch (enemyState)
+        {
+            case EnemyStates.Wandering:
+                Wander();
+                break;
+            case EnemyStates.Following:
+                FollowPlayer();
+                break;
+            case EnemyStates.Attacking:
+                AttackPlayer();
+                break;
+        }
+
+
+
+
+
         if (isTriggered)
         {
             cooldownTimer -= Time.deltaTime;
-            if (cooldownTimer > 0)
-            {
-                FollowPlayer();
-            }
-            else
+            if (cooldownTimer <= 0)
             {
                 isTriggered = false;
                 cooldownTimer = chaseCooldown;
                 ChangeMyMaterial(wanderMaterial);
+                enemyState = EnemyStates.Wandering;
             }
         }
-        else
-        {
-            Wander();
-        }
+
     }
 
     private void FixedUpdate()
     {
-        // Check if the enemy can attack the player
         if (isTriggered && Vector3.Distance(transform.position, player.position) <= distanceToAttackPlayer)
         {
-            AttackPlayer();
+            enemyState = EnemyStates.Attacking;
         }
     }
 
@@ -88,18 +90,8 @@ public class EnemyAI : MonoBehaviour, IDamageable
         // Update enemy health bar or other UI if necessary
     }
 
-
-    private void ChangeMyMaterial(Material material)
-    {
-        if (zombieRenderer.material != material)
-        {
-            zombieRenderer.material = material;
-        }
-    }
-
     private void HandleDeath()
     {
-        // Handle enemy death (e.g., drop loot, play animation)
         Debug.Log("Enemy is dead!");
         Destroy(gameObject);
     }
@@ -116,7 +108,10 @@ public class EnemyAI : MonoBehaviour, IDamageable
 
     private void AttackPlayer()
     {
-        //Debug.Log("Attacking player");
+        // Handle attack logic here
+        Debug.Log("Attacking player");
+
+        // You can implement the damage to the player here
     }
 
     private void OnTriggerEnter(Collider other)
@@ -125,6 +120,7 @@ public class EnemyAI : MonoBehaviour, IDamageable
         {
             isTriggered = true;
             cooldownTimer = chaseCooldown; // Reset cooldown when triggered
+            enemyState = EnemyStates.Following;
         }
     }
 
@@ -159,5 +155,13 @@ public class EnemyAI : MonoBehaviour, IDamageable
         NavMeshHit navHit;
         NavMesh.SamplePosition(randDirection, out navHit, dist, layermask);
         return navHit.position;
+    }
+
+    private void ChangeMyMaterial(Material material)
+    {
+        if (zombieRenderer.material != material)
+        {
+            zombieRenderer.material = material;
+        }
     }
 }

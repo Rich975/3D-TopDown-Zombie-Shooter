@@ -1,5 +1,6 @@
-using UnityEngine;
 using System;
+using UnityEngine.UIElements;
+using UnityEngine.UI;
 
 public class HealthSystem
 {
@@ -28,6 +29,7 @@ public class HealthSystem
         }
     }
 
+   
     public void Heal(float amount)
     {
         currentHealth += amount;
@@ -39,4 +41,5 @@ public class HealthSystem
     public float GetHealth() => currentHealth;
     public float GetMaxHealth() => maxHealth;
 }
+
 

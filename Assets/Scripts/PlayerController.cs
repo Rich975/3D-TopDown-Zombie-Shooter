@@ -14,12 +14,18 @@ public class PlayerController : MonoBehaviour, IDamageable
     private HealthSystem healthSystem;
     private HealthBar healthBar;
 
+    [SerializeField] private GameObject damagePanel;
+
     // Start is called before the first frame update
     private void Start()
     {
         healthSystem = new HealthSystem(maxHealth);
         healthBar = FindObjectOfType<HealthBar>();
-        Debug.Log(healthBar.gameObject);
+
+        if (healthBar == null)
+        {
+            Debug.LogError("HealthBar not found in the scene.");
+        }
 
         healthSystem.OnHealthChanged += HandleHealthChanged;
         healthSystem.OnDeath += HandleDeath;
@@ -27,7 +33,6 @@ public class PlayerController : MonoBehaviour, IDamageable
         mainCamera = Camera.main;
         rb = GetComponentInChildren<Rigidbody>();
         animator = GetComponentInChildren<Animator>();
-        
     }
 
     // Update is called once per frame
@@ -45,10 +50,12 @@ public class PlayerController : MonoBehaviour, IDamageable
     public void TakeDamage(float damage)
     {
         healthSystem.TakeDamage(damage);
+        healthBar.DamageFlash();  // Trigger damage flash effect
     }
 
     private void HandleHealthChanged(float healthPercent)
     {
+        Debug.Log($"Health changed: {healthPercent * 100}%");
         healthBar.UpdateHealthBar(healthPercent);
     }
 
@@ -111,7 +118,6 @@ public class PlayerController : MonoBehaviour, IDamageable
         if (collision.gameObject.CompareTag("Zombie"))
         {
             TakeDamage(10);
-            HandleHealthChanged(20);
         }
     }
 }
