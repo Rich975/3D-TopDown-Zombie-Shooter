@@ -1,12 +1,13 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Rendering;
 
 public class EnemyAI : MonoBehaviour, IDamageable
 {
     [SerializeField] private float wanderRadius = 10f;
     [SerializeField] private float wanderTimer = 5f;
     [SerializeField] private float chaseCooldown = 10f;
-    [SerializeField] private float distanceToAttackPlayer = 1.5f;
+    [SerializeField] private float attackDistance = 2f;
 
     [SerializeField] private Material wanderMaterial;
     [SerializeField] private Material attackMaterial;
@@ -17,13 +18,18 @@ public class EnemyAI : MonoBehaviour, IDamageable
     private bool isTriggered;
     private float cooldownTimer;
     private float wanderTimerCounter;
-    private Vector3 lastPlayerPosition;
 
     public float maxHealth = 50f;
+    public float currentHealth;
     private HealthSystem healthSystem;
+
+
+
 
     public enum EnemyStates { Wandering, Following, Attacking }
     public EnemyStates enemyState;
+
+    private Animator anim;
 
     private void Start()
     {
@@ -33,10 +39,18 @@ public class EnemyAI : MonoBehaviour, IDamageable
 
         zombieRenderer = GetComponentInChildren<Renderer>();
         agent = GetComponent<NavMeshAgent>();
+        agent.speed = SetRandomMovementSpeed();
+
         isTriggered = false;
         cooldownTimer = chaseCooldown;
         wanderTimerCounter = wanderTimer;
         player = GameObject.FindGameObjectWithTag("Player").transform;
+
+        anim = GetComponentInChildren<Animator>();
+        currentHealth = maxHealth;
+
+        ChangeMyMaterial(wanderMaterial);
+        enemyState = EnemyStates.Wandering;
     }
 
     private void Update()
@@ -45,18 +59,17 @@ public class EnemyAI : MonoBehaviour, IDamageable
         {
             case EnemyStates.Wandering:
                 Wander();
+                SetAnimationState("isIdle");
                 break;
             case EnemyStates.Following:
                 FollowPlayer();
+                SetAnimationState("isFollowing");
                 break;
             case EnemyStates.Attacking:
                 AttackPlayer();
+                SetAnimationState("isAttacking");
                 break;
         }
-
-
-
-
 
         if (isTriggered)
         {
@@ -68,21 +81,36 @@ public class EnemyAI : MonoBehaviour, IDamageable
                 ChangeMyMaterial(wanderMaterial);
                 enemyState = EnemyStates.Wandering;
             }
+            else
+            {
+                ChangeMyMaterial(attackMaterial);
+            }
         }
-
     }
 
-    private void FixedUpdate()
+
+    private float SetRandomMovementSpeed()
     {
-        if (isTriggered && Vector3.Distance(transform.position, player.position) <= distanceToAttackPlayer)
-        {
-            enemyState = EnemyStates.Attacking;
-        }
+        float minSpeed = 3f;
+        float maxSpeed = 7f;
+        float zombieMovementSpeed = Random.Range(minSpeed, maxSpeed);
+        return zombieMovementSpeed;
+    }
+
+
+    private void SetAnimationState(string state)
+    {
+        anim.SetBool("isIdle", state == "isIdle");
+        anim.SetBool("isFollowing", state == "isFollowing");
+        anim.SetBool("isAttacking", state == "isAttacking");
     }
 
     public void TakeDamage(float damage)
     {
         healthSystem.TakeDamage(damage);
+        currentHealth -= damage;    
+        Debug.Log($"Enemy has {currentHealth} hitpoints left");
+        
     }
 
     private void HandleHealthChanged(float healthPercent)
@@ -98,20 +126,26 @@ public class EnemyAI : MonoBehaviour, IDamageable
 
     private void FollowPlayer()
     {
-        if (Vector3.Distance(player.position, lastPlayerPosition) > 0.1f) // Avoid stuttering by only updating if position has changed significantly
+        if (Vector3.Distance(transform.position, player.position) > agent.stoppingDistance)
         {
             agent.SetDestination(player.position);
-            lastPlayerPosition = player.position;
         }
-        ChangeMyMaterial(attackMaterial);
+
+        if (Vector3.Distance(transform.position, player.position) <= attackDistance)
+        {
+            enemyState = EnemyStates.Attacking;
+        }
+
+
     }
 
     private void AttackPlayer()
     {
         // Handle attack logic here
-        Debug.Log("Attacking player");
-
-        // You can implement the damage to the player here
+        if (Vector3.Distance(transform.position, player.position) > attackDistance)
+        {
+            enemyState = EnemyStates.Following;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -129,13 +163,25 @@ public class EnemyAI : MonoBehaviour, IDamageable
         if (other.gameObject.CompareTag("Player"))
         {
             isTriggered = true;
+            enemyState = EnemyStates.Following;
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        isTriggered = false;
+        if (other.gameObject.CompareTag("Player"))
+        {
+            isTriggered = false;
+            cooldownTimer = chaseCooldown; // Reset cooldown when the player exits the trigger
+        }
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        TakeDamage(10);
+    }
+
+
 
     private void Wander()
     {
@@ -165,3 +211,4 @@ public class EnemyAI : MonoBehaviour, IDamageable
         }
     }
 }
+
