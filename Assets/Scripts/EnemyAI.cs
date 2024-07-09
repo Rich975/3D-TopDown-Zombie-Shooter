@@ -8,6 +8,8 @@ public class EnemyAI : MonoBehaviour, IDamageable
     [SerializeField] private float wanderTimer = 5f;
     [SerializeField] private float chaseCooldown = 10f;
     [SerializeField] private float attackDistance = 2f;
+    [SerializeField] private float attackDamage = 10f;
+
 
     [SerializeField] private Material wanderMaterial;
     [SerializeField] private Material attackMaterial;
@@ -113,6 +115,18 @@ public class EnemyAI : MonoBehaviour, IDamageable
         
     }
 
+    public void DealDamage()
+    {
+        if (Vector3.Distance(transform.position, player.position) <= attackDistance)
+        {
+            IDamageable playerHealth = player.GetComponent<IDamageable>();
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(attackDamage);
+            }
+        }
+    }
+
     private void HandleHealthChanged(float healthPercent)
     {
         // Update enemy health bar or other UI if necessary
@@ -178,7 +192,6 @@ public class EnemyAI : MonoBehaviour, IDamageable
 
     private void OnCollisionEnter(Collision collision)
     {
-        TakeDamage(10);
     }
 
 

@@ -266,6 +266,7 @@ GameObject:
   - component: {fileID: 3855442304670437221}
   - component: {fileID: 1877848824613527367}
   - component: {fileID: 4252818625027547683}
+  - component: {fileID: 2035808764242941343}
   m_Layer: 0
   m_Name: ZombieModel
   m_TagString: Zombie
@@ -384,6 +385,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2035808764242941343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1070559538194624053}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04341870e70b3704a8b5633c6fe66a20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1369194437204009611
 GameObject:
   m_ObjectHideFlags: 0
@@ -1319,9 +1332,11 @@ MonoBehaviour:
   wanderTimer: 5
   chaseCooldown: 10
   attackDistance: 2
+  attackDamage: 10
   wanderMaterial: {fileID: 2100000, guid: e494fdfbea09aab44b116c7a4e25b434, type: 2}
   attackMaterial: {fileID: 2100000, guid: 92591c435cad6624facda3047f3974fa, type: 2}
   maxHealth: 50
+  currentHealth: 0
   enemyState: 0
 --- !u!195 &2621196320040967322
 NavMeshAgent:

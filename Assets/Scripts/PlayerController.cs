@@ -53,6 +53,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         healthBar.DamageFlash();  // Trigger damage flash effect
     }
 
+
     private void HandleHealthChanged(float healthPercent)
     {
         Debug.Log($"Health changed: {healthPercent * 100}%");
