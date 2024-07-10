@@ -1,7 +1,6 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
-using UnityEditor.Rendering;
 
 public class HealthBar : MonoBehaviour
 {
@@ -31,7 +30,7 @@ public class HealthBar : MonoBehaviour
     {
         float timer = 0f;
         float alpha = 0f;
-        damagePanel.color = originalColor;  
+        damagePanel.color = originalColor;
 
         while (timer < flashDuration)
         {
@@ -46,6 +45,3 @@ public class HealthBar : MonoBehaviour
         //damagePanel.color = originalColor;
     }
 }
-
-
-

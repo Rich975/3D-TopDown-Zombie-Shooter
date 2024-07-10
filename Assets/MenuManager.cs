@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -13,21 +12,34 @@ public class MenuManager : MonoBehaviour
 
     [SerializeField] private Image gameTitle;
 
-    public enum MenuScreenState {Title, Start, Pause, GameOver, Game };
-    public MenuScreenState state;
+    public static MenuManager Instance;
 
+    public enum MenuScreenState
+    { Title, Start, Pause, GameOver, Game };
+
+    public MenuScreenState state;
     private bool isPaused;
 
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         ChangeState(MenuScreenState.Title);
-        
-
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         HandlePause();
         HandleTitle();
@@ -39,10 +51,9 @@ public class MenuManager : MonoBehaviour
 
         switch (state)
         {
-
             case MenuScreenState.Title:
                 ScreenManager(false, false, false, true);
-                Time.timeScale = 1;   
+                Time.timeScale = 1;
                 break;
 
             case MenuScreenState.Start:
@@ -52,7 +63,7 @@ public class MenuManager : MonoBehaviour
                 break;
 
             case MenuScreenState.Pause:
-                ScreenManager(false, true, false, true);
+                ScreenManager(false, true, false, false);
                 Time.timeScale = 0; // Pause the game
                 break;
 
@@ -85,11 +96,14 @@ public class MenuManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            ChangeState(MenuScreenState.Start);
+            if (state == MenuScreenState.Title)
+            {
+                ChangeState(MenuScreenState.Start);
+            }
 
+            return;
         }
     }
-
 
     private void HandlePause()
     {
@@ -113,10 +127,27 @@ public class MenuManager : MonoBehaviour
         ChangeState(MenuScreenState.Start);
     }
 
+    public void StartNewGame()
+    {
+        SceneManager.LoadScene(1);
+        ChangeState(MenuScreenState.Game);
+    }
+
+
+    public void LoadNextLevel()
+    {
+        int currentScene = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentScene + 1);
+    }
+
     public void ResumeGame()
     {
         isPaused = false;
         ChangeState(MenuScreenState.Game);
     }
-}
 
+    public void BackToMainMenu()
+    {
+        ChangeState(MenuScreenState.Title);
+    }
+}

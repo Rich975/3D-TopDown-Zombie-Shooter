@@ -11159,6 +11159,7 @@ GameObject:
   - component: {fileID: 1086715781}
   - component: {fileID: 1086715780}
   - component: {fileID: 1086715783}
+  - component: {fileID: 1086715784}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -11249,6 +11250,18 @@ CapsuleCollider:
   m_Height: 1.7932405
   m_Direction: 1
   m_Center: {x: -0.01825285, y: -0.12992716, z: 0.04150927}
+--- !u!114 &1086715784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086715779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f45d9b1c97430a40a82494f3e00aeed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1095402240 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3648918976049265191, guid: 3ad903ffc672c9b419c8efcd16aae2e0,
@@ -18734,7 +18747,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1823165497
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18747,9 +18760,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 014ca7fd19113c74f9212f7ac8e0639c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  titleScreen: {fileID: 0}
   startScreen: {fileID: 779256676}
   pauseScreen: {fileID: 571157311}
   gameOverScreen: {fileID: 1360271918}
+  pressSpaceText: {fileID: 0}
+  gameTitle: {fileID: 0}
   state: 0
 --- !u!4 &1823165498
 Transform:

@@ -1,10 +1,9 @@
 using System;
-using UnityEngine.UIElements;
-using UnityEngine.UI;
 
 public class HealthSystem
 {
     public event Action<float> OnHealthChanged; // Event to notify health changes
+
     public event Action OnDeath; // Event to notify when health reaches zero
 
     private float maxHealth;
@@ -29,7 +28,6 @@ public class HealthSystem
         }
     }
 
-   
     public void Heal(float amount)
     {
         currentHealth += amount;
@@ -39,7 +37,6 @@ public class HealthSystem
     }
 
     public float GetHealth() => currentHealth;
+
     public float GetMaxHealth() => maxHealth;
 }
-
-

@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour, IDamageable
 {
@@ -9,6 +8,9 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private Camera mainCamera;
     private Animator animator;
+
+    private bool isFiring;
+
 
     public float maxHealth = 100f;
     private HealthSystem healthSystem;
@@ -39,6 +41,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     private void Update()
     {
         MouseAim();
+        PlayerAttack();
     }
 
     private void FixedUpdate()
@@ -52,7 +55,6 @@ public class PlayerController : MonoBehaviour, IDamageable
         healthSystem.TakeDamage(damage);
         healthBar.DamageFlash();  // Trigger damage flash effect
     }
-
 
     private void HandleHealthChanged(float healthPercent)
     {
@@ -88,6 +90,22 @@ public class PlayerController : MonoBehaviour, IDamageable
         {
             animator.SetBool("isRunning", false);
         }
+    }
+
+    private void PlayerAttack()
+    {
+        if (Input.GetMouseButton(0))
+        {
+            Debug.Log("shooting");
+            animator.SetBool("isFiring", true);
+        }
+        else
+        { 
+            animator.SetBool("isFiring", false);
+
+        }
+
+       
     }
 
     private void MouseAim()

@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Rendering;
 
 public class EnemyAI : MonoBehaviour, IDamageable
 {
@@ -9,7 +8,6 @@ public class EnemyAI : MonoBehaviour, IDamageable
     [SerializeField] private float chaseCooldown = 10f;
     [SerializeField] private float attackDistance = 2f;
     [SerializeField] private float attackDamage = 10f;
-
 
     [SerializeField] private Material wanderMaterial;
     [SerializeField] private Material attackMaterial;
@@ -25,10 +23,9 @@ public class EnemyAI : MonoBehaviour, IDamageable
     public float currentHealth;
     private HealthSystem healthSystem;
 
+    public enum EnemyStates
+    { Wandering, Following, Attacking }
 
-
-
-    public enum EnemyStates { Wandering, Following, Attacking }
     public EnemyStates enemyState;
 
     private Animator anim;
@@ -63,10 +60,12 @@ public class EnemyAI : MonoBehaviour, IDamageable
                 Wander();
                 SetAnimationState("isIdle");
                 break;
+
             case EnemyStates.Following:
                 FollowPlayer();
                 SetAnimationState("isFollowing");
                 break;
+
             case EnemyStates.Attacking:
                 AttackPlayer();
                 SetAnimationState("isAttacking");
@@ -90,7 +89,6 @@ public class EnemyAI : MonoBehaviour, IDamageable
         }
     }
 
-
     private float SetRandomMovementSpeed()
     {
         float minSpeed = 3f;
@@ -98,7 +96,6 @@ public class EnemyAI : MonoBehaviour, IDamageable
         float zombieMovementSpeed = Random.Range(minSpeed, maxSpeed);
         return zombieMovementSpeed;
     }
-
 
     private void SetAnimationState(string state)
     {
@@ -110,9 +107,8 @@ public class EnemyAI : MonoBehaviour, IDamageable
     public void TakeDamage(float damage)
     {
         healthSystem.TakeDamage(damage);
-        currentHealth -= damage;    
+        currentHealth -= damage;
         Debug.Log($"Enemy has {currentHealth} hitpoints left");
-        
     }
 
     public void DealDamage()
@@ -149,8 +145,6 @@ public class EnemyAI : MonoBehaviour, IDamageable
         {
             enemyState = EnemyStates.Attacking;
         }
-
-
     }
 
     private void AttackPlayer()
@@ -194,8 +188,6 @@ public class EnemyAI : MonoBehaviour, IDamageable
     {
     }
 
-
-
     private void Wander()
     {
         wanderTimerCounter -= Time.deltaTime;
@@ -224,4 +216,3 @@ public class EnemyAI : MonoBehaviour, IDamageable
         }
     }
 }
-
