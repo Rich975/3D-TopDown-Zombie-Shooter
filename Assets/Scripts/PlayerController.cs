@@ -73,10 +73,11 @@ public class PlayerController : MonoBehaviour, IDamageable
     {
         hMovement = Input.GetAxisRaw("Horizontal");
         vMovement = Input.GetAxisRaw("Vertical");
+
         if (rb != null)
         {
-            rb.AddForce(Vector3.right * playerSpeed * hMovement);
-            rb.AddForce(Vector3.forward * playerSpeed * vMovement);
+            Vector3 movement = new Vector3(hMovement, 0, vMovement).normalized * playerSpeed;
+            rb.AddForce(movement);
         }
     }
 
@@ -85,11 +86,12 @@ public class PlayerController : MonoBehaviour, IDamageable
         // Check the magnitude of the velocity vector
         if (rb.velocity.magnitude > 0.1f) // Adjust the threshold as needed
         {
-            animator.SetBool("isRunning", true);
+            animator.SetFloat("isRunning", 1);
         }
         else
         {
-            animator.SetBool("isRunning", false);
+            animator.SetFloat("isRunning", 0);
+
         }
     }
 
@@ -101,6 +103,11 @@ public class PlayerController : MonoBehaviour, IDamageable
             animator.SetTrigger("Punch");
         }
 
+    }
+
+    private void GettingAttackedAnimation()
+    {
+        animator.SetTrigger("GetHit");
     }
 
     private void MouseAim()
@@ -132,6 +139,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         if (collision.gameObject.CompareTag("Zombie"))
         {
             TakeDamage(10);
+            GettingAttackedAnimation();
         }
     }
 }
