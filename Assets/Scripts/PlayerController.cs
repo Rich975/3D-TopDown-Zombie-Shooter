@@ -48,6 +48,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     {
         PlayerMovement();
         PlayerMovementAnimations();
+
     }
 
     public void TakeDamage(float damage)
@@ -94,18 +95,12 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void PlayerAttack()
     {
-        if (Input.GetMouseButton(0))
+        
+        if (Input.GetMouseButtonDown(0)) 
         {
-            Debug.Log("shooting");
-            animator.SetBool("isFiring", true);
-        }
-        else
-        { 
-            animator.SetBool("isFiring", false);
-
+            animator.SetTrigger("Punch");
         }
 
-       
     }
 
     private void MouseAim()
