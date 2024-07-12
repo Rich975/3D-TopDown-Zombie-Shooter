@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private Camera mainCamera;
     private Animator animator;
+    private PlayerInventory inventory;
 
     private bool isFiring;
 
@@ -35,6 +36,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         mainCamera = Camera.main;
         rb = GetComponentInChildren<Rigidbody>();
         animator = GetComponentInChildren<Animator>();
+        inventory = GetComponent<PlayerInventory>();
     }
 
     // Update is called once per frame
@@ -42,6 +44,8 @@ public class PlayerController : MonoBehaviour, IDamageable
     {
         MouseAim();
         PlayerAttack();
+        HandleWeaponSwitch();
+
     }
 
     private void FixedUpdate()
@@ -97,13 +101,25 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void PlayerAttack()
     {
-        
-        if (Input.GetMouseButtonDown(0)) 
+        if (Input.GetMouseButtonDown(0))
         {
-            animator.SetTrigger("Punch");
+            inventory.UseCurrentWeapon();
         }
-
     }
+
+    private void HandleWeaponSwitch()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            inventory.ToggleWeapon(0); // Equip the first weapon
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            inventory.ToggleWeapon(1); // Equip the second weapon, etc.
+        }
+        // Add more keys for more weapons if necessary
+    }
+
 
     private void GettingAttackedAnimation()
     {
@@ -140,6 +156,20 @@ public class PlayerController : MonoBehaviour, IDamageable
         {
             TakeDamage(10);
             GettingAttackedAnimation();
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Weapon"))
+        {
+            Weapon weapon = other.GetComponent<Weapon>();
+            if (weapon != null)
+            {
+                inventory.AddWeapon(weapon);
+                // Optionally deactivate the weapon object after picking it up
+                other.gameObject.SetActive(false);
+            }
         }
     }
 }
