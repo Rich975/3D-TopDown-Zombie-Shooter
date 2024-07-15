@@ -30,6 +30,7 @@ public class PlayerInventory : MonoBehaviour
                 // If the selected weapon is already equipped, unequip it
                 weapons[currentWeaponIndex].Unequip();
                 currentWeaponIndex = -1; // No weapon is currently equipped
+                
             }
             else
             {
@@ -50,7 +51,7 @@ public class PlayerInventory : MonoBehaviour
     {
         if (currentWeaponIndex != -1)
         {
-            weapons[currentWeaponIndex].Use();
+            weapons[currentWeaponIndex].Fire();
         }
     }
 

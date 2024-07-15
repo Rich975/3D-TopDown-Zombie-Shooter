@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour, IDamageable
@@ -18,6 +19,11 @@ public class PlayerController : MonoBehaviour, IDamageable
     private HealthBar healthBar;
 
     [SerializeField] private GameObject damagePanel;
+
+    [SerializeField] private float forwardSpeed = 10f;
+    [SerializeField] private float backwardSpeed = 5f;
+
+    private CursorManager cursorManager;
 
     // Start is called before the first frame update
     private void Start()
@@ -45,6 +51,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         MouseAim();
         PlayerAttack();
         HandleWeaponSwitch();
+        HandleWeapon();
 
     }
 
@@ -80,8 +87,16 @@ public class PlayerController : MonoBehaviour, IDamageable
 
         if (rb != null)
         {
-            Vector3 movement = new Vector3(hMovement, 0, vMovement).normalized * playerSpeed;
-            rb.AddForce(movement);
+            Vector3 movement = new Vector3(hMovement, 0, vMovement).normalized
+                ;
+            // Determine the movement direction relative to the player's facing direction
+            Vector3 forward = transform.forward;
+            float dotProduct = Vector3.Dot(forward, movement);
+
+            // Determine the speed based on the dot product
+            float speed = dotProduct > 0 ? forwardSpeed : backwardSpeed;
+
+            rb.AddForce(movement * speed);
         }
     }
 
@@ -118,7 +133,37 @@ public class PlayerController : MonoBehaviour, IDamageable
             inventory.ToggleWeapon(1); // Equip the second weapon, etc.
         }
         // Add more keys for more weapons if necessary
+
+        // Update the cursor based on whether a weapon is equipped
+       
+       
+
+
     }
+
+    private void HandleWeapon()
+    {
+        if (Input.GetMouseButtonDown(1)) // Assuming right mouse button for aiming
+        {
+            animator.SetBool("isAiming", true);
+
+        }
+        else if (Input.GetMouseButtonUp(1))
+        {
+            animator.SetBool("isAiming", false);
+        }
+
+        if (Input.GetMouseButtonDown(0)) // Assuming left mouse button for shooting
+        {
+            //animator.SetTrigger("Shoot");
+        }
+
+      
+    }
+
+
+
+
 
 
     private void GettingAttackedAnimation()
@@ -169,6 +214,9 @@ public class PlayerController : MonoBehaviour, IDamageable
                 inventory.AddWeapon(weapon);
                 // Optionally deactivate the weapon object after picking it up
                 other.gameObject.SetActive(false);
+
+                // Update the cursor to the targeting reticle when a weapon is equipped
+                cursorManager.SetTargetingCursor();
             }
         }
     }
